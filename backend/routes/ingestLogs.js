@@ -29,6 +29,13 @@ router.post('/ingest', async (req, res) => {
         if(!collectionExists){
             try {
                 await mongoose.connection.db.createCollection(collectionName);
+                const StandardLogModel = mongoose.model(collectionName, StandardLog);
+
+                await StandardLogModel.createIndexes([
+                    {key: {"level": 1}},
+                    {key: {"resourceId": 1}},
+                    {key: {"message": "text"}},
+                ])
             } 
             catch (error) {
                 console.error("Error creating collection:", error);
@@ -41,13 +48,14 @@ router.post('/ingest', async (req, res) => {
         const StandardLogModel = mongoose.model(collectionName, StandardLog);
         const result = await StandardLogModel.bulkWrite(bulkOps);
         res.status(200).json({
-            msg: "Log saved successfully",
+            msg: "Log(s) saved successfully",
             logs
         })
     } 
     catch (error) {
         res.status(500).json({
-            msg: "Some unexpected error occured."
+            msg: "Some unexpected error occured.",
+            error
         })
     }
     finally {
