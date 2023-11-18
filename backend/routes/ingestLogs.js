@@ -33,9 +33,13 @@ router.post('/ingest', async (req, res) => {
 
                 await StandardLogModel.createIndexes([
                     {key: {"level": 1}},
-                    {key: {"resourceId": 1}},
-                    {key: {"message": "text"}},
+                    {key: {"resourceId": 1}}
                 ])
+                await StandardLogModel.createIndexes([
+                    { key: { "level": "text" } },
+                    { key: { "resourceId": "text" } },
+                    { key: { "message": "text" } },
+                ]);
             } 
             catch (error) {
                 console.error("Error creating collection:", error);
