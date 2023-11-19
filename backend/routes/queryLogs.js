@@ -12,10 +12,7 @@ router.get('/compound_queries', async (req, res) => {
     try {
         const { level, resourceId, message, traceId, spanId, commit, parentResourceId } = req.query;
 
-        await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(MONGODB_URI);
         const collectionNames = await mongoose.connection.db.listCollections().toArray();
         const aggregationStages = collectionNames.map(collection => ({
             $unionWith: {
@@ -65,10 +62,7 @@ router.get('/timestamp_based', async(req, res) => {
         const startDate = new Date(req.query.startTime);
         const endDate = new Date(req.query.endTime);
 
-        await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(MONGODB_URI);
         const collections = await mongoose.connection.db.listCollections().toArray();        
         const collectionNames = collections.map(collection => collection.name);
 
@@ -96,10 +90,7 @@ router.get('/timestamp_based', async(req, res) => {
 router.get('/full_text_search', async (req, res) => {
     try {
         const searchText = req.query.q;
-        await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(MONGODB_URI);
         const collections = await mongoose.connection.db.listCollections().toArray(); 
         let allResults = [];
 

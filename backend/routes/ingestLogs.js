@@ -10,13 +10,10 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 router.post('/ingest', async (req, res) => {
     try {
-        await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(MONGODB_URI);
         console.log("DB connected.")
         
-        const logs = await req.body;
+        const logs = await req.body.logs;
         const bulkOps = logs.map(log => ({
             insertOne: {
                 document: log
@@ -29,22 +26,24 @@ router.post('/ingest', async (req, res) => {
         if(!collectionExists){
             try {
                 await mongoose.connection.db.createCollection(collectionName);
+                console.log('1 done\n\n\n')
                 const StandardLogModel = mongoose.model(collectionName, StandardLog);
 
                 await StandardLogModel.createIndexes([
                     {key: {"level": 1}},
                     {key: {"resourceId": 1}}
                 ])
-                await StandardLogModel.createIndexes([
-                    { key: { "level": "text" } },
-                    { key: { "resourceId": "text" } },
-                    { key: { "message": "text" } },
-                ]);
+                console.log('2 done\n\n\n')
+                // await StandardLogModel.createIndexes([
+                //     { key: { "level": "text" } },
+                //     { key: { "resourceId": "text" } },
+                //     { key: { "message": "text" } },
+                // ]);
             } 
             catch (error) {
-                console.error("Error creating collection:", error);
                 return res.status(500).json({
                     msg: "Error creating collection",
+                    error: error
                 });
             }
         }
@@ -53,7 +52,8 @@ router.post('/ingest', async (req, res) => {
         const result = await StandardLogModel.bulkWrite(bulkOps);
         res.status(200).json({
             msg: "Log(s) saved successfully",
-            logs
+            logs: logs,
+            result: result
         })
     } 
     catch (error) {
