@@ -24,7 +24,7 @@ interface ResultDataType {
 
 const SearchBar: React.FC = () => {
     const [searchData, setSearchData] = useState<FilterDataType>({});
-    const [searchDisplay, setSearchDisplay] = useState<string[]>([]);
+    const [searchDisplay, setSearchDisplay] = useState<string[] | undefined>(undefined);
     const [filter, setFilter] = useState<string>("");
     const [filterValue, setFilterValue] = useState<string>("");
     const [start, setStart] = useState<string>("");
@@ -70,6 +70,10 @@ const SearchBar: React.FC = () => {
     }
 
     const searchLogs = async () => {
+        if(!searchDisplay){
+            alert("Please select some filters.");
+            return;
+        }
         try {
             const params = {
                 ...searchData
@@ -110,7 +114,7 @@ const SearchBar: React.FC = () => {
         <div className="w-screen h-auto flex flex-col justify-center items-center gap-4">
             <div className="w-screen h-[10vh] flex flex-row justify-center items-center">
                 <input value={searchDisplay} readOnly placeholder="Search" type="text" className="font-semibold text-black px-2 text-black w-[80vw] sm:w-[57vw] h-[5vh] border-[2px] border-white rounded-tl-[10px] rounded-bl-[10px] bg-white" />
-                <div className="cursor-pointer w-12 h-[5vh] bg-blue-600 hover:bg-blue-700 active:bg-blue-900 flex flex-row justify-center items-center border-[1px] border-white rounded-tr-[10px] rounded-br-[10px]" 
+                <div className="cursor-pointer w-12 h-[5vh] bg-blue-600 active:bg-blue-700 flex flex-row justify-center items-center border-[1px] border-white rounded-tr-[10px] rounded-br-[10px]" 
                 onClick={searchLogs}
                 >
                     <i className="fas fa-search text-white"></i>
@@ -132,7 +136,7 @@ const SearchBar: React.FC = () => {
                 <input value={filterValue} onChange={(e) => setFilterValue(e.target.value)} type="text" placeholder="Filter value" className="w-[30vw] sm:w-[24vw] pb-[2px] text-black h-[4vh] border-l-[2px] border-gray-800 rounded-br-[10px] rounded-tr-[10px] bg-white pl-2" />
 
 
-                <div className="flex flex-row justify-center items-center cursor-pointer ml-20 border-[0.5px] border-white rounded-[10px] px-4 h-[4vh] bg-blue-600 hover:bg-blue-700 active:bg-blue-900 font-semibold" onClick={addInputValue}>
+                <div className="flex flex-row justify-center items-center cursor-pointer ml-20 border-[0.5px] border-white rounded-[10px] px-4 h-[4vh] bg-blue-600 active:bg-blue-700 font-semibold" onClick={addInputValue}>
                     Add Filter
                 </div>
             </div>
@@ -147,13 +151,19 @@ const SearchBar: React.FC = () => {
 
                 <input value={end} onChange={(e) => setEnd(e.target.value)} type="text" placeholder="End" className="w-[20vw] sm:w-[16vw] pb-[2px] text-black h-[4vh] border-l-[2px] border-gray-800 rounded-br-[10px] rounded-tr-[10px] bg-white pl-2" />    
 
-                <div className="flex flex-row justify-center items-center cursor-pointer ml-20 border-[0.5px] border-white rounded-[10px] px-[27px] h-[4vh] bg-blue-600 hover:bg-blue-700 active:bg-blue-900 font-semibold" onClick={handleTimestampSearch}>
+                <div className="flex flex-row justify-center items-center cursor-pointer ml-20 border-[0.5px] border-white rounded-[10px] px-[27px] h-[4vh] bg-blue-600 active:bg-blue-700 font-semibold" onClick={handleTimestampSearch}>
                     Search
                 </div>            
 
             </div>
 
-            <div className={`${show ? "block" : "hidden"} w-screen h-auto flex flex-col justify-center items-center mt-[10vh]`}>
+            <div className="flex flex-row justify-center items-center cursor-pointer border-[0.5px] border-white rounded-[10px] px-[27px] h-[4vh] bg-red-300 active:bg-red-400 font-semibold mt-[5vh]" onClick={() => {
+                location.reload();
+            }}>
+                Clear
+            </div>
+
+            <div className={`${show ? "block" : "hidden"} w-screen sm:w-[60vw] h-auto flex flex-col justify-center items-center my-[10vh]`}>
                 <ShowResults result={result} />
             </div>
 

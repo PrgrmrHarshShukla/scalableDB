@@ -13,12 +13,8 @@ router.get('/compound_queries', async (req, res) => {
         const { level, resourceId, message, traceId, spanId, commit, parentResourceId } = req.query;
 
         await mongoose.connect(MONGODB_URI);
-        const collectionNames = await mongoose.connection.db.listCollections().toArray();
-        const aggregationStages = collectionNames.map(collection => ({
-            $unionWith: {
-                coll: collection.name,
-            },
-        }))
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        const collectionNames = collections.map(coll => coll.name);
 
         const matchStages = [];
         if (level) matchStages.push({ level });
@@ -30,20 +26,24 @@ router.get('/compound_queries', async (req, res) => {
         if (parentResourceId) {
             matchStages.push({ 'metadata.parentResourceId': parentResourceId });
         }
-        if (matchStages.length > 0) {
-            aggregationStages.push({
-              $match: {
-                $or: matchStages,
-              },
-            });
-        }
 
-        const result = await db.aggregate(aggregationStages).toArray();
-        res.status(200).json(result);
+        const collectionPromises = collectionNames.map(async (collectionName) => {
+            const result = await mongoose.connection.db.collection(collectionName).find({
+                $and: matchStages,
+            }).toArray();
+        
+            return result;
+        });
+        
+        const results = await Promise.all(collectionPromises);
+        const mergedResult = [].concat(...results);
+
+        res.status(200).json(mergedResult);
     } 
     catch (error) {
+        console.log("Error:\n", error);
         res.status(500).json({
-            msg: "Some unexpected error occured.",
+            msg: "Some unexpected error occured while fetching logs.",
             error
         })        
     }
@@ -58,24 +58,32 @@ router.get('/timestamp_based', async(req, res) => {
         const { startTime, endTime } = req.query;
 
         const timeData1 = startTime.slice(0, 7);
-        const timeData2 = endTime.slice(0, 7);
-        const startDate = new Date(req.query.startTime);
-        const endDate = new Date(req.query.endTime);
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
 
         await mongoose.connect(MONGODB_URI);
         const collections = await mongoose.connection.db.listCollections().toArray();        
         const collectionNames = collections.map(collection => collection.name);
 
-        const filteredCollection = collectionNames(name => name.slice(4, 11) === timeData1);
+        const filteredCollection = collectionNames.filter(name => (name === `logs_${timeData1}`));
 
-        const result = await db.collection(filteredCollection[0]).find({
-            timestamp: { $gte: startDate, $lte: endDate },
-        }).toArray();
+        if(filteredCollection.length > 0){
+            const result = await mongoose.connection.db.collection(filteredCollection[0]).find({
+                timestamp: { $gte: startDate, $lte: endDate },
+            }).toArray();
 
-        res.status(200).json(result);
+    
+            res.status(200).json(result);
+        }
+        else{
+            res.status(404).json({
+                msg: "No such logs found"
+            });
+        }
 
     } 
     catch (error) {
+        console.log("Error:\n", error);
         res.status(500).json({
             msg: "Some unexpected error occured.",
             error

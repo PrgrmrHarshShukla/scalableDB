@@ -11,7 +11,6 @@ const MONGODB_URI = process.env.MONGODB_URI;
 router.post('/ingest', async (req, res) => {
     try {
         await mongoose.connect(MONGODB_URI);
-        console.log("DB connected.")
         
         const logs = await req.body.logs;
         const bulkOps = logs.map(log => ({
@@ -34,11 +33,6 @@ router.post('/ingest', async (req, res) => {
                     {key: {"resourceId": 1}}
                 ])
                 console.log('2 done\n\n\n')
-                // await StandardLogModel.createIndexes([
-                //     { key: { "level": "text" } },
-                //     { key: { "resourceId": "text" } },
-                //     { key: { "message": "text" } },
-                // ]);
             } 
             catch (error) {
                 return res.status(500).json({
