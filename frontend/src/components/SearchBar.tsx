@@ -78,7 +78,7 @@ const SearchBar: React.FC = () => {
             const params = {
                 ...searchData
             }
-            const response = await axios.get(`https://scalabledb.onrender.com/filters/compound_queries`, { params });
+            const response = await axios.get("https://scalabledb.onrender.com/filters/compound_queries", { params });
             setResult(response.data);
 
             setSearchDisplay([]);
@@ -98,7 +98,7 @@ const SearchBar: React.FC = () => {
                 "endTime": end
             }
             
-            const response = await axios.get(`https://scalabledb.onrender.com/filters/timestamp_based`, { params });
+            const response = await axios.get("https://scalabledb.onrender.com/filters/timestamp_based", { params });
             setResult(response.data);
 
             setShow(true);
