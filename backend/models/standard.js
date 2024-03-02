@@ -15,4 +15,4 @@ const standardLogSchema = new mongoose.Schema({
         parentResourceId: String,
     }
 });
-module.exports = mongoose.model('logs', standardLogSchema);
+module.exports = standardLogSchema;
