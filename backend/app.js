@@ -24,7 +24,7 @@ db.once('open', () => console.log('Atlas connected.'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({
-    origin: 'http://localhost:5173', 
+    origin: 'https://scalables.netlify.app', 
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type']
 }))

@@ -78,7 +78,7 @@ const SearchBar: React.FC = () => {
             const params = {
                 ...searchData
             }
-            const response = await axios.get("http://localhost:3000/filters/compound_queries", { params });
+            const response = await axios.get(`${process.env.VITE_BACKEND_URL}/filters/compound_queries`, { params });
             setResult(response.data);
 
             setSearchDisplay([]);
@@ -98,7 +98,7 @@ const SearchBar: React.FC = () => {
                 "endTime": end
             }
             
-            const response = await axios.get("http://localhost:3000/filters/timestamp_based", { params });
+            const response = await axios.get(`${process.env.VITE_BACKEND_URL}/filters/timestamp_based`, { params });
             setResult(response.data);
 
             setShow(true);
@@ -113,7 +113,7 @@ const SearchBar: React.FC = () => {
     return(
         <div className="w-screen h-auto flex flex-col justify-center items-center gap-4">
             <div className="w-screen h-[10vh] flex flex-row justify-center items-center">
-                <input value={searchDisplay} readOnly placeholder="Search" type="text" className="font-semibold text-black px-2 text-black w-[80vw] sm:w-[57vw] h-[5vh] border-[2px] border-white rounded-tl-[10px] rounded-bl-[10px] bg-white" />
+                <input value={searchDisplay} readOnly placeholder="Search" type="text" className="font-semibold text-black px-2 w-[80vw] sm:w-[57vw] h-[5vh] border-[2px] border-white rounded-tl-[10px] rounded-bl-[10px] bg-white" />
                 <div className="cursor-pointer w-12 h-[5vh] bg-blue-600 active:bg-blue-700 flex flex-row justify-center items-center border-[1px] border-white rounded-tr-[10px] rounded-br-[10px]" 
                 onClick={searchLogs}
                 >
