@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const standardLogSchema = new mongoose.Schema({
     level: String,
     message: String,
-    timestamp: Date,
+    timestamp: {
+        type: Date,
+        default: Date.now()
+    },
     resourceId: String,
     traceId: String,
     spanId: String,
